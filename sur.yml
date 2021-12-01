@@ -1,0 +1,4 @@
+blueprint: fruitpal_api_description.apib
+base_url: https://fruitpal.doma.com/
+user: mango
+password: apple
