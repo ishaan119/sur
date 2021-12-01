@@ -5,7 +5,7 @@ import yaml
 
 def request(base_url, http_verb,path,data,params, auth):
     api_request = api_requests.APIRequest(base_url)
-    return api_request(http_verb,path,data=data,params=params, auth=auth)
+    return api_request(http_verb, path,data=data,params=params, auth=auth)
 
 
 def get_config(filename):
@@ -20,7 +20,10 @@ def parse_apib_blueprint_doc(filename):
     transactions = []
     with open(filename, 'r') as f:
         parsed_result = parse(f.read())
+        # Loop through every API
         for elem in parsed_result.api.content:
+            # We can add multiple requests response for each API so loop
+            # through each and create a separate transaction.
             for t in elem.transitions[0].transactions:
                 api_info = {}
                 api_info['api_path'] = elem.href.defract
@@ -81,6 +84,8 @@ def evaluate_display_results(transaction, response, result):
 def main():
     config = get_config("sur.yml")
     auth = None
+    # Only Support Basic Auth for now. If user and password is provided we
+    # will add it to the request.
     if 'user' in config and 'password' in config:
         auth = (config.get('user'), config.get('password'))
 
@@ -88,6 +93,7 @@ def main():
     total_tests = len(transactions)
     test_passed = 0
     for transaction in transactions:
+        # Run test for each transaction.
         response = run_test(config.get('base_url'), transaction, auth)
         result = validate_response(transaction, response)
         if evaluate_display_results(transaction, response, result):
